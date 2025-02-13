@@ -10,4 +10,5 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	golang.org/x/net v0.33.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
