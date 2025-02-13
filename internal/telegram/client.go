@@ -6,10 +6,10 @@ import (
 
 type Client struct {
 	bot    *tgbotapi.BotAPI
-	config *Config
+	config *TelegramConfig
 }
 
-func NewClient(config *Config) (*Client, error) {
+func NewClient(config *TelegramConfig) (*Client, error) {
 	bot, err := tgbotapi.NewBotAPI(config.BotToken)
 	if err != nil {
 		return nil, err
