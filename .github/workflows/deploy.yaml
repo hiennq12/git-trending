@@ -29,7 +29,7 @@ jobs:
 
       - name: Build project
         run: |
-          GOOS=linux GOARCH=amd64 go build -o app ./cmd/main.go  # Adjust the path to your main.go
+          GOOS=linux GOARCH=amd64 go build -o app_git_trending ./cmd/main.go  # Adjust the path to your main.go
 
       - name: Run tests
         run: go test ./... -v
@@ -50,7 +50,7 @@ jobs:
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p /opt/github_trending'
           
           # Copy the binary and any additional files
-          scp app ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
+          scp app_git_trending ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
           
           # Optional: Copy config files if needed
           # scp config.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
