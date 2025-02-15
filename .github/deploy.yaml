@@ -1,0 +1,59 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main  # hoặc master, tùy theo branch chính của bạn
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  build-and-deploy:
+    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Build project
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o app ./cmd/main.go  # Adjust the path to your main.go
+
+      - name: Run tests
+        run: go test ./... -v
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add SSH known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          # Create directory for the app if it doesn't exist
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'mkdir -p /opt/myapp'
+          
+          # Copy the binary and any additional files
+          scp app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/myapp/
+          
+          # Optional: Copy config files if needed
+          # scp config.yaml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/myapp/
+          
+          # Restart the service
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'sudo systemctl restart myapp.service'
