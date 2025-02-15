@@ -29,6 +29,8 @@ func NewConfig() *TelegramConfig {
 	// Tạo đường dẫn đến file config.yaml
 	configPath := filepath.Join(projectRoot, "config.yaml")
 
+	// path in server
+	configPath = "/opt/github_trending/config/config.yaml"
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		panic(err)
