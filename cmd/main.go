@@ -28,8 +28,9 @@ func main() {
 	trendingJob := github.NewTrendingJob(githubService, telegramClient)
 
 	// Schedule job to run at 8:30 AM daily
-	// */5 * * * * 5p
-	err = scheduler.AddJob("30 8 * * *", trendingJob)
+	// 30 8 * * *
+	// */30 * * * *
+	err = scheduler.AddJob("*/30 * * * *", trendingJob)
 	if err != nil {
 		log.Fatalf("Error adding job: %v", err)
 	}
