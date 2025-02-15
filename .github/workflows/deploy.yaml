@@ -47,13 +47,13 @@ jobs:
       - name: Deploy to server
         run: |
           # Create directory for the app if it doesn't exist
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'mkdir -p /opt/myapp'
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'mkdir -p /opt/github_trending'
           
           # Copy the binary and any additional files
-          scp app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/myapp/
+          scp app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/github_trending/
           
           # Optional: Copy config files if needed
-          # scp config.yaml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/myapp/
+          # scp config.yaml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/github_trending/
           
           # Restart the service
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'sudo systemctl restart myapp.service'
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'sudo systemctl restart github_trending.service'
