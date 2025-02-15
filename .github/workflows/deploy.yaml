@@ -37,23 +37,23 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
       - name: Add SSH known hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to server
         run: |
           # Create directory for the app if it doesn't exist
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'mkdir -p /opt/github_trending'
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p /opt/github_trending'
           
           # Copy the binary and any additional files
-          scp app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/github_trending/
+          scp app ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
           
           # Optional: Copy config files if needed
-          # scp config.yaml ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/opt/github_trending/
+          # scp config.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
           
           # Restart the service
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} 'sudo systemctl restart github_trending.service'
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'sudo systemctl restart github_trending.service'
