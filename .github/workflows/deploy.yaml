@@ -3,7 +3,7 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - main  # hoặc master, tùy theo branch chính của bạn
+      - main
   pull_request:
     types:
       - closed
@@ -56,4 +56,4 @@ jobs:
           # scp config.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
           
           # Restart the service
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'sudo systemctl restart github_trending.service'
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'sudo systemctl restart github-trending.service'
