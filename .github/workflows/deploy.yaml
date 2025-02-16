@@ -47,7 +47,7 @@ jobs:
       - name: Deploy to server
         run: |
           # Create directory for the app if it doesn't exist
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p /opt/github_trending'
+          # ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p /opt/github_trending'
           
           # Copy the binary and any additional files
           scp app_git_trending ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
