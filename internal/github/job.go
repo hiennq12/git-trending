@@ -3,6 +3,7 @@ package github
 import (
 	"fmt"
 	"github_trending/internal/models"
+	"github_trending/internal/openai"
 	"github_trending/internal/telegram"
 	"log"
 	"time"
@@ -11,12 +12,14 @@ import (
 type TrendingJob struct {
 	githubService  *Service
 	telegramClient *telegram.Client
+	openaiClient   *openai.Client
 }
 
-func NewTrendingJob(githubService *Service, telegramClient *telegram.Client) *TrendingJob {
+func NewTrendingJob(githubService *Service, telegramClient *telegram.Client, openaiClient *openai.Client) *TrendingJob {
 	return &TrendingJob{
 		githubService:  githubService,
 		telegramClient: telegramClient,
+		openaiClient:   openaiClient,
 	}
 }
 
@@ -27,6 +30,25 @@ func (j *TrendingJob) Run() error {
 	repos, err := j.githubService.GetTrending(models.TrendingOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get trending repos: %w", err)
+	}
+
+	// Enhance descriptions with OpenAI
+	for _, repo := range repos {
+		repoFullName := fmt.Sprintf("%s/%s", repo.Author, repo.Name)
+		repoInfo := fmt.Sprintf("Repository: %s\nOriginal Description: %s\nLanguage: %s\nStars: %d",
+			repoFullName, repo.Description, repo.Language, repo.Stars)
+
+		enhancedDesc, err := j.openaiClient.GenerateDescription(repoFullName, repoInfo)
+		if err != nil {
+			log.Printf("Error generating description for %s: %v", repo.Name, err)
+			continue
+		}
+
+		repo.EnhancedDescription = enhancedDesc
+		// Add small delay only for new descriptions (when not from cache)
+		if enhancedDesc != "" {
+			time.Sleep(time.Second)
+		}
 	}
 
 	// Build and send message
