@@ -18,18 +18,18 @@ func NewSQLiteCache(dbPath string) (*SQLiteCache, error) {
 	}
 
 	// Create table if not exists
-	//_, err = db.Exec(`
-	//    CREATE TABLE IF NOT EXISTS repo_descriptions (
-	//        id INTEGER PRIMARY KEY AUTOINCREMENT,
-	//        repo_name TEXT UNIQUE,
-	//        description LONG TEXT,
-	//        created_at DATETIME,
-	//        updated_at DATETIME
-	//    )
-	//`)
-	//if err != nil {
-	//	return nil, fmt.Errorf("error creating table: %w", err)
-	//}
+	_, err = db.Exec(`
+	   CREATE TABLE IF NOT EXISTS repo_descriptions (
+	       id INTEGER PRIMARY KEY AUTOINCREMENT,
+	       repo_name TEXT UNIQUE,
+	       description TEXT,
+	       created_at DATETIME,
+	       updated_at DATETIME
+	   )
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("error creating table: %w", err)
+	}
 
 	return &SQLiteCache{db: db}, nil
 }
