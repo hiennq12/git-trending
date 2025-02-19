@@ -7,17 +7,13 @@ import (
 	"strings"
 )
 
-func BuildMessage(repos []*models.Repository) string {
+func BuildMessage(repo *models.Repository, rank int) string {
 	message := strings.Builder{}
 	message.WriteString(fmt.Sprintf(" %v \n", utils.GetToday()))
-
-	for i, repo := range repos {
-		message.WriteString(fmt.Sprintf("%v. Name: %v \n", i+1, repo.Name))
-		message.WriteString(fmt.Sprintf("\t Language: %v \n", repo.Language))
-		message.WriteString(fmt.Sprintf("\t Original Description: %v \n", repo.Description))
-		message.WriteString(fmt.Sprintf("\t Detailed Analysis: %v \n", repo.EnhancedDescription))
-		message.WriteString(fmt.Sprintf("\t URL: %v \n\n", repo.URL))
-	}
-
+	message.WriteString(fmt.Sprintf("%v. Name: %v \n", rank+1, repo.Name))
+	message.WriteString(fmt.Sprintf("\t Language: %v \n", repo.Language))
+	message.WriteString(fmt.Sprintf("\t Original Description: %v \n", repo.Description))
+	message.WriteString(fmt.Sprintf("\t Detailed Analysis: %v \n", repo.EnhancedDescription))
+	message.WriteString(fmt.Sprintf("\t URL: %v \n\n", repo.URL))
 	return message.String()
 }

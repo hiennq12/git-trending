@@ -22,7 +22,7 @@ func NewClient(config *Config, cacheDB *cache.SQLiteCache) *Client {
 
 func (c *Client) GenerateDescription(repoFullName, repoInfo string) (string, error) {
 	// Try to get from cache first
-	cachedDesc, err := c.cache.Get(repoFullName)
+	cachedDesc, err := c.cache.GetDescription(repoFullName)
 	if err != nil {
 		log.Printf("Error checking cache for %s: %v", repoFullName, err)
 	}
@@ -65,7 +65,7 @@ func (c *Client) GenerateDescription(repoFullName, repoInfo string) (string, err
 
 	description := resp.Choices[0].Message.Content
 	// Save to cache
-	err = c.cache.Set(repoFullName, description)
+	err = c.cache.SetDescripton(repoFullName, description)
 	if err != nil {
 		log.Printf("Error saving to cache for %s: %v", repoFullName, err)
 	}

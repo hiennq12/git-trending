@@ -3,6 +3,8 @@ package openai
 import (
 	"gopkg.in/yaml.v3"
 	"os"
+	"path/filepath"
+	"runtime"
 )
 
 type Config struct {
@@ -14,8 +16,12 @@ type OpenAIConfig struct {
 }
 
 func NewConfig() *Config {
-	// Sử dụng cùng cách đọc config như telegram
-	configPath := "/path/to/config.yaml" // Điều chỉnh path tương tự như trong telegram/config.go
+	// Lấy đường dẫn của file hiện tại (config.go)
+	_, filename, _, _ := runtime.Caller(0)
+	// Lấy đường dẫn đến thư mục gốc của project
+	projectRoot := filepath.Join(filepath.Dir(filename), "..", "..")
+	// Tạo đường dẫn đến file config.yaml
+	configPath := filepath.Join(projectRoot, "config.yaml")
 
 	data, err := os.ReadFile(configPath)
 	if err != nil {

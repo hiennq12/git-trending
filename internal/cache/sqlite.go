@@ -18,23 +18,23 @@ func NewSQLiteCache(dbPath string) (*SQLiteCache, error) {
 	}
 
 	// Create table if not exists
-	_, err = db.Exec(`
-        CREATE TABLE IF NOT EXISTS repo_descriptions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            repo_name TEXT UNIQUE,
-            description TEXT,
-            created_at DATETIME,
-            updated_at DATETIME
-        )
-    `)
-	if err != nil {
-		return nil, fmt.Errorf("error creating table: %w", err)
-	}
+	//_, err = db.Exec(`
+	//    CREATE TABLE IF NOT EXISTS repo_descriptions (
+	//        id INTEGER PRIMARY KEY AUTOINCREMENT,
+	//        repo_name TEXT UNIQUE,
+	//        description LONG TEXT,
+	//        created_at DATETIME,
+	//        updated_at DATETIME
+	//    )
+	//`)
+	//if err != nil {
+	//	return nil, fmt.Errorf("error creating table: %w", err)
+	//}
 
 	return &SQLiteCache{db: db}, nil
 }
 
-func (c *SQLiteCache) Get(repoName string) (string, error) {
+func (c *SQLiteCache) GetDescription(repoName string) (string, error) {
 	var description string
 	err := c.db.QueryRow(
 		"SELECT description FROM repo_descriptions WHERE repo_name = ?",
@@ -51,7 +51,7 @@ func (c *SQLiteCache) Get(repoName string) (string, error) {
 	return description, nil
 }
 
-func (c *SQLiteCache) Set(repoName, description string) error {
+func (c *SQLiteCache) SetDescripton(repoName, description string) error {
 	now := time.Now()
 	_, err := c.db.Exec(`
         INSERT INTO repo_descriptions (repo_name, description, created_at, updated_at)

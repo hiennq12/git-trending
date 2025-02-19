@@ -47,15 +47,26 @@ func (j *TrendingJob) Run() error {
 		repo.EnhancedDescription = enhancedDesc
 		// Add small delay only for new descriptions (when not from cache)
 		if enhancedDesc != "" {
-			time.Sleep(time.Second)
+			time.Sleep(500 * time.Millisecond)
 		}
 	}
 
 	// Build and send message
-	message := telegram.BuildMessage(repos)
-	if err := j.telegramClient.SendMessage(message); err != nil {
-		return fmt.Errorf("failed to send telegram message: %w", err)
+	// for all repos then build messages and send to telegram one by one
+	// since the maximum size of each message sent in telegram is 4096 characters
+
+	for i, repo := range repos {
+		message := telegram.BuildMessage(repo, i)
+		err = j.telegramClient.SendMessage(message)
+
+		if err != nil {
+			return fmt.Errorf("failed to send telegram message: %w", err)
+		}
 	}
+	//message := telegram.BuildMessage(repos)
+	//if err := j.telegramClient.SendMessage(message); err != nil {
+	//	return fmt.Errorf("failed to send telegram message: %w", err)
+	//}
 
 	log.Printf("Completed trending job at %v", time.Now().Format("2006-01-02 15:04:05"))
 	return nil
