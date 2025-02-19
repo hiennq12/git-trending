@@ -1,4 +1,4 @@
-package telegram
+package openai
 
 import (
 	"gopkg.in/yaml.v3"
@@ -7,21 +7,15 @@ import (
 	"runtime"
 )
 
-const (
-	DefaultBotToken = "TOKEN"
-	DefaultChatID   = int64(-123456789)
-)
-
 type Config struct {
-	TelegramConfig TelegramConfig `yaml:"telegram_config"`
+	APIKey string `yaml:"api_key"`
 }
 
-type TelegramConfig struct {
-	BotToken string `yaml:"bot_token"`
-	ChatID   int64  `yaml:"chat_id"`
-} // `yaml:"telegram_config"`
+type OpenAIConfig struct {
+	OpenAIConfig Config `yaml:"openai_config"`
+}
 
-func NewConfig() *TelegramConfig {
+func NewConfig() *Config {
 	// Lấy đường dẫn của file hiện tại (config.go)
 	_, filename, _, _ := runtime.Caller(0)
 	// Lấy đường dẫn đến thư mục gốc của project
@@ -29,20 +23,17 @@ func NewConfig() *TelegramConfig {
 	// Tạo đường dẫn đến file config.yaml
 	configPath := filepath.Join(projectRoot, "config.yaml")
 
-	// path in server
-	//configPath = "/opt/github_trending/config/config.yaml"
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		panic(err)
 	}
 
-	config := &Config{}
+	config := &OpenAIConfig{}
 	err = yaml.Unmarshal(data, config)
 	if err != nil {
 		panic(err)
 	}
-	return &TelegramConfig{
-		config.TelegramConfig.BotToken,
-		config.TelegramConfig.ChatID,
+	return &Config{
+		APIKey: config.OpenAIConfig.APIKey,
 	}
 }

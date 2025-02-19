@@ -2,16 +2,28 @@
 package main
 
 import (
+	"github_trending/internal/cache"
 	"github_trending/internal/github"
+	"github_trending/internal/openai"
 	"github_trending/internal/scheduler"
 	"github_trending/internal/telegram"
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 )
 
 func main() {
+	// Initialize cache
+	dbPath := filepath.Join("data", "cache.db")
+	os.MkdirAll("data", 0755) // Create data directory if not exists
+	cacheDB, err := cache.NewSQLiteCache(dbPath)
+	if err != nil {
+		log.Fatalf("Error initializing cache: %v", err)
+	}
+	defer cacheDB.Close()
+
 	// Initialize services
 	githubService := github.NewService()
 
@@ -21,11 +33,14 @@ func main() {
 		log.Fatalf("Error initializing Telegram client: %v", err)
 	}
 
+	openaiConfig := openai.NewConfig()
+	openaiClient := openai.NewClient(openaiConfig, cacheDB)
+
 	// Initialize scheduler
 	scheduler := scheduler.NewScheduler()
 
 	// Create trending job
-	trendingJob := github.NewTrendingJob(githubService, telegramClient)
+	trendingJob := github.NewTrendingJob(githubService, telegramClient, openaiClient)
 
 	// Schedule job to run at 8:30 AM daily
 	// 30 8 * * *
