@@ -3,8 +3,6 @@ package telegram
 import (
 	"gopkg.in/yaml.v3"
 	"os"
-	"path/filepath"
-	"runtime"
 )
 
 const (
@@ -22,15 +20,15 @@ type TelegramConfig struct {
 } // `yaml:"telegram_config"`
 
 func NewConfig() *TelegramConfig {
-	// Lấy đường dẫn của file hiện tại (config.go)
-	_, filename, _, _ := runtime.Caller(0)
-	// Lấy đường dẫn đến thư mục gốc của project
-	projectRoot := filepath.Join(filepath.Dir(filename), "..", "..")
-	// Tạo đường dẫn đến file config.yaml
-	configPath := filepath.Join(projectRoot, "config.yaml")
+	//// Lấy đường dẫn của file hiện tại (config.go)
+	//_, filename, _, _ := runtime.Caller(0)
+	//// Lấy đường dẫn đến thư mục gốc của project
+	//projectRoot := filepath.Join(filepath.Dir(filename), "..", "..")
+	//// Tạo đường dẫn đến file config.yaml
+	//configPath := filepath.Join(projectRoot, "config.yaml")
 
 	// path in server
-	//configPath = "/opt/github_trending/config/config.yaml"
+	configPath := "/opt/github_trending/config/config.yaml"
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		panic(err)
