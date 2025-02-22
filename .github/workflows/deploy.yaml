@@ -1,5 +1,4 @@
 name: Deploy to Production
-
 on:
   push:
     branches:
@@ -7,53 +6,50 @@ on:
   pull_request:
     types:
       - closed
-
 jobs:
   build-and-deploy:
     if: github.event.pull_request.merged == true || github.event_name == 'push'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.23'
           cache: true
           cache-dependency-path: go.sum
-
       - name: Verify dependencies
         run: go mod verify
-
       - name: Build project
         run: |
-          GOOS=linux GOARCH=amd64 go build -o app_git_trending ./cmd/main.go  # Adjust the path to your main.go
-
+          GOOS=linux GOARCH=amd64 go build -o app_git_trending ./cmd/main.go
       - name: Run tests
         run: go test ./... -v
-
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-
       - name: Add SSH known hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-
       - name: Deploy to server
         run: |
-          # Create directory for the app if it doesn't exist
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p /opt/github_trending'
+          # Tạo thư mục với sudo (vì service chạy dưới root)
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'sudo mkdir -p /opt/github_trending'
           
-          # Copy the binary and any additional files
-          scp app_git_trending ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
+          # Upload binary vào thư mục tạm trong home directory
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p ~/temp_deploy'
+          scp app_git_trending ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:~/temp_deploy/
           
-          # Optional: Copy config files if needed
-          # scp config.yaml ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/opt/github_trending/
+          # Di chuyển file từ thư mục tạm sang thư mục đích với sudo
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} '
+            sudo mv ~/temp_deploy/app_git_trending /opt/github_trending/ &&
+            sudo chown root:root /opt/github_trending/app_git_trending &&
+            sudo chmod +x /opt/github_trending/app_git_trending &&
+            rm -rf ~/temp_deploy
+          '
           
-          # Restart the service
+          # Restart service
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'sudo systemctl restart github-trending.service'
