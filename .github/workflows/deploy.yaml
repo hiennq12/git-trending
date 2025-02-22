@@ -36,14 +36,16 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
       - name: Deploy to server
         run: |
-          # Tạo thư mục với sudo (vì service chạy dưới root)
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'sudo mkdir -p /opt/github_trending'
+          # Tạo các thư mục cần thiết trên server
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} '
+            sudo mkdir -p /opt/github_trending &&
+            mkdir -p ~/temp_deploy
+          '
           
-          # Upload binary vào thư mục tạm trong home directory
-          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p ~/temp_deploy'
+          # Copy file binary vào thư mục tạm
           scp app_git_trending ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:~/temp_deploy/
           
-          # Di chuyển file từ thư mục tạm sang thư mục đích với sudo
+          # Di chuyển file và set quyền
           ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} '
             sudo mv ~/temp_deploy/app_git_trending /opt/github_trending/ &&
             sudo chown root:root /opt/github_trending/app_git_trending &&
