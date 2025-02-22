@@ -47,7 +47,7 @@ func (j *TrendingJob) Run() error {
 		repo.EnhancedDescription = enhancedDesc
 		// Add small delay only for new descriptions (when not from cache)
 		if enhancedDesc != "" {
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(time.Second)
 		}
 	}
 
@@ -63,10 +63,12 @@ func (j *TrendingJob) Run() error {
 			return fmt.Errorf("failed to send telegram message: %w", err)
 		}
 	}
-	//message := telegram.BuildMessage(repos)
-	//if err := j.telegramClient.SendMessage(message); err != nil {
-	//	return fmt.Errorf("failed to send telegram message: %w", err)
-	//}
+
+	err = j.telegramClient.SendMessage("========END DAY========")
+
+	if err != nil {
+		return fmt.Errorf("failed to send end day message: %w", err)
+	}
 
 	log.Printf("Completed trending job at %v", time.Now().Format("2006-01-02 15:04:05"))
 	return nil

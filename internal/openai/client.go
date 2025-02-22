@@ -38,24 +38,32 @@ func (c *Client) GenerateDescription(repoFullName, repoInfo string) (string, err
 
 	ctx := context.Background()
 	prompt := fmt.Sprintf(`Given the following GitHub repository information, 
-    provide a detailed description in about 100 words that explains the purpose, 
-    features, and potential use cases of the repository:
+    provide a detailed description that explains the repository in the following format:
 
     %s
 
-    Focus on technical aspects and practical applications.`, repoInfo)
+    Please structure the response as follows:
+    1. Overview (1-2 sentences about what the repository is)
+    2. Key Features:
+       - List 3-4 main features with technical details
+       - Each bullet point should be 1-2 sentences
+    3. Use Cases: 
+       - List 2-3 practical applications
+       - Each bullet point should be 1 sentence
+
+    Focus on technical aspects and practical applications. Keep the total response within 100 words.`, repoInfo)
 
 	resp, err := c.client.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
-			Model: openai.GPT3Dot5Turbo,
+			Model: openai.GPT4oMini,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
 					Content: prompt,
 				},
 			},
-			MaxTokens: 200,
+			MaxTokens: 300,
 		},
 	)
 
