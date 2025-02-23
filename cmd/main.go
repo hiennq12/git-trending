@@ -45,10 +45,10 @@ func main() {
 	// Schedule job to run at 8:30 AM daily
 	// 30 8 * * *
 	// */30 * * * *
-	//err = scheduler.AddJob("30 8 * * *", trendingJob)
-	//if err != nil {
-	//	log.Fatalf("Error adding job: %v", err)
-	//}
+	err = scheduler.AddJob("30 8 * * *", trendingJob)
+	if err != nil {
+		log.Fatalf("Error adding job: %v", err)
+	}
 
 	// Start scheduler
 	scheduler.Start()
